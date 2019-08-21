@@ -18,7 +18,7 @@ let flightSuretyApp = new web3.eth.Contract(FlightSuretyApp.abi, config.appAddre
   });
 
 // registere 50 oracle 
-let oraclesNum = 50;
+let oraclesNum = 20;
 let accounts ;
 
 web3.eth.getAccounts(async(error, accts) => {
@@ -33,7 +33,7 @@ web3.eth.getAccounts(async(error, accts) => {
     if (error) console.log("OracleRequest error : "+error);
     console.log("Oracle event is :"+ Object.keys(event.returnValues));
     for(let i=0; i<=oraclesNum; i++){
-      let myIndexes = await flightSuretyApp.methods.getMyIndexes().call({from: accounts[i+49]});
+      let myIndexes = await flightSuretyApp.methods.getMyIndexes().call({from: accounts[i]});
         // console.log("my indexes : "+myIndexes);
         if(myIndexes.indexOf(event.returnValues.index) >= 0){
         let statusCode = 10*(Math.floor(Math.random()*6));
@@ -47,7 +47,7 @@ web3.eth.getAccounts(async(error, accts) => {
           event.returnValues.timestamp,
           statusCode)
           .send(
-          {from: accounts[i+49],
+          {from: accounts[i],
             gas: gasLimit, 
             gasPrice: gasPrice
           });
@@ -75,7 +75,7 @@ app.get('/api', (req, res) => {
 async function registerOracles(){
     for(let i= 0; i<=oraclesNum; i++){
     try{
-    await flightSuretyApp.methods.registerOracle().send({from:accounts[i+49], value : web3.utils.toWei('1', 'ether') });  
+    await flightSuretyApp.methods.registerOracle().send({from:accounts[i], value : web3.utils.toWei('1', 'ether') });  
     console.log("Oracle # " +i+ " has been registered" );
     }catch(e){
       // console.log(e);
