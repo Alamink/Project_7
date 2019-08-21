@@ -6,6 +6,7 @@ FlightSurety is a sample application project for Udacity's Blockchain course.
 ## requirement to run project wihtout error
 In Ganache make sure you have min of 100 accounts.
 In Ganache set GAS PRICE to 20000000000 and GAS LIMIT to 9999999
+Also, make sure to run server first and wait until 50 oracle has been registered then run dapp.
 
 ## Install
 

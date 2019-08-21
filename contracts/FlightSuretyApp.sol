@@ -244,6 +244,8 @@ contract FlightSuretyApp {
     {
         bytes32 key = getFlightKey(airline, flight, timestamp);
 
+        flights[key].statusCode = statusCode;
+
         if(statusCode == STATUS_CODE_LATE_AIRLINE){ // refund customer with 1.5 X where is X is max as 1 ether
             // call creditInsureesApp to created all passanger
             for(uint i = 0; i<flights[key].passengers.length; i++){
@@ -261,9 +263,10 @@ contract FlightSuretyApp {
                         )
                         external
     {
-        // bytes32 flightKey = getFlightKey(airline, flight, timestamp);
-        // require(flights[flightKey].isRegistered,"Flight is not registered");
-
+        bytes32 flightKey = getFlightKey(airline, flight, timestamp);
+        require(flights[flightKey].isRegistered, "Ignore flight not registered");
+        require(flights[flightKey].statusCode == STATUS_CODE_UNKNOWN, 'Flight has already status!');
+  
         uint8 index = getRandomIndex(msg.sender);
 
         // Generate a unique key for storing the request
