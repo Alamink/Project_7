@@ -2,6 +2,8 @@ import FlightSuretyApp from '../../build/contracts/FlightSuretyApp.json';
 import FlightSuretyData from '../../build/contracts/FlightSuretyData.json';
 import Config from './config.json';
 import Web3 from 'web3';
+import DOM from './dom';
+
 
 export default class Contract {
     constructor(network, callback) {
@@ -22,7 +24,9 @@ export default class Contract {
         this.gasLimit = 9999999;
         this.gasPrice = 20000000000;
 
-        this.flights = [{
+
+        this.flights = 
+          [{
             name: 'SA 150',
             timestamp: Math.floor(Date.now() / 1000)
         },
@@ -36,7 +40,6 @@ export default class Contract {
         }
     ];
     }
-
     initialize(callback) {
         this.web3.eth.getAccounts(async(error, accts) => {
             let self = this;
@@ -77,7 +80,7 @@ export default class Contract {
                         gasPrice: this.gasPrice
                     });
                 }catch(e){
-                    console.log(e+" @ " + accts[counter]);
+                    // console.log(e+" @ " + accts[counter]);
                 }
                 console.log(await self.flightSuretyData.methods.getAirline(accts[counter]).call());
 
@@ -97,13 +100,7 @@ export default class Contract {
                 }catch(e){
                     console.log(e);
                 }
-            } 
-            // await this.flightSuretyApp.events.allEvents({
-            //     fromBlock: 0
-            //     }, function (error, event) {
-            //         if (error) console.log(error);
-            //         console.log(event);
-            //     });            
+            }             
             callback();
         });
     }
@@ -142,7 +139,7 @@ export default class Contract {
         }); 
 
     }
-    buyInsurance(flight, callback){
+    buyInsurance(flight, amount, callback){
         let self = this;
         let payload = {
             airline: self.airlines[0],
@@ -152,10 +149,26 @@ export default class Contract {
         self.flightSuretyApp.methods.buyInsurance(payload.airline, payload.flight, payload.timestamp)
         .send({
             from: self.passengers[0],
-            value: self.web3.utils.toWei('1', 'ether')
+            value: amount
         },(error, result) => {
             callback(error, payload);
+            self.updateBlance();
         });
-
     }
+    withdraw(callback){
+        let self = this;
+        this.flightSuretyApp.methods.withdraw().send({
+            from: self.passengers[0]
+            },(error,result) =>{
+             callback(error,result);
+            self.updateBlance();
+    });
+    }
+    async updateBlance(){
+        console.log("updating balance");
+       let balance = await this.flightSuretyData.methods.getPassengerCreditBalance(this.passengers[0]).call();
+        console.log("Balance = "+balance);
+        DOM.elid("balance").innerHTML = balance;
+    }
+    
 }

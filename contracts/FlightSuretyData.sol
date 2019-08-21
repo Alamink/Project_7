@@ -13,7 +13,6 @@ contract FlightSuretyData {
     bool private operational = true;                                    // Blocks all state changes throughout the contract if false
 
 
-
     enum AirLineState { // can add other states as well if needed for future.
         DEFAULT, // not registered airline
         Registered, // has been registered 
@@ -191,7 +190,7 @@ contract FlightSuretyData {
     requireIsOperational
     {
         // not sure if should I transfer , if so to whom it should go
-        contractOwner.transfer(msg.value); 
+       address(this).transfer(msg.value); 
         airlines[_payinyAirline].state = AirLineState.Funded;
         numberOfFundedAirLines = numberOfFundedAirLines.add(1);
     }
@@ -211,7 +210,7 @@ contract FlightSuretyData {
                             requireIsOperational
     {
         passnagerAccount[passnager][flightKey] = msg.value;
-        contractOwner.transfer(msg.value); 
+        address(this).transfer(msg.value); 
         // transfer the value to the woner 
     }
 
@@ -239,10 +238,12 @@ contract FlightSuretyData {
                             (
                                 address passager
                             )
+                            payable
                             external
                             requireIsOperational
     {
        uint256 credit = passnagerCredit[passager];
+       require(credit > 0, "No credit");
        passnagerCredit[passager] = 0;
        passager.transfer(credit);
     }

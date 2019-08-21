@@ -30,15 +30,29 @@ import './flightsurety.css';
 
         DOM.elid("buy-insurance").addEventListener('click',()=>{
             let flight = DOM.elid('flight-number-buy').selectedIndex;
-            console.log("buy insurance : "+flight);
-            contract.buyInsurance(flight,(error, result) => {
+            let amount = DOM.elid("num-amount-wei").value;
+            console.log("buy insurance : "+flight + " amount: "+ amount);
+            contract.buyInsurance(flight,amount,(error, result) => {
                 display('Buy insurance', 'Trigger Insruance payment', 
                 [ { label: 'Pay insurace for flight', error: error, value:result.flight + ' ' + result.timestamp} ]);
             });
         });
+        DOM.elid("withdraw-blance").addEventListener('click',()=>{
+            console.log("Withdraw credit");
+            // DOM.elid("balance").innerHTML = update value;
+            contract.withdraw((error, result) => {
+                display('withdraw Balance', 'Trigger payout for ', 
+                [ { label: 'Pay passenger for flight dalyed', error: error,value:"Money sent back"} ]);
+            });
+        })
         contract.getFlightStatus((error, result) =>{
+               if(result.status == 20){
+                   // update credit 
+                   console.log("Filght is delayd, update balance");
+                   contract.updateBlance();     
+            }
             display("Flights","Trigger flight status",              
-            [ { label: 'Flight Status', error: error, value: result.flight +" "+ result.timestamp + " "+result.status} ]);
+            [ { label: 'Flight Status', error: error, value: result.flight +" "+ result.timestamp + "  "+result.status} ]);
         });
     
     });    

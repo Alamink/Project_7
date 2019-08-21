@@ -6,6 +6,7 @@ contract('Flight Surety Tests', async (accounts) => {
 
   
   const TEST_ORACLES_COUNT = 40;
+
       // Watch contract events
       const STATUS_CODE_UNKNOWN = 0;
       const STATUS_CODE_ON_TIME = 10;
@@ -155,6 +156,17 @@ contract('Flight Surety Tests', async (accounts) => {
     }
     assert.equal(result, true, "Funded AirLine should be able to register a flight");
   });
+
+  it("should not allow double flight register", async()=>{
+     let result = true;
+    try{
+    await config.flightSuretyApp.registerFlight(flight,timestamp,{from: accounts[1]});
+    }catch(e){
+      result = false;
+    }
+    assert.equal(result, false, "Should not allow double flight registratoin");
+  });
+  
   it("Can not register Flight form non-funded airline", async()=>{
     let result = true;
     try{
@@ -164,6 +176,7 @@ contract('Flight Surety Tests', async (accounts) => {
     }
     assert.equal(result, false, "Non-Funded AirLine should not be able to register a flight");
   });
+
   it("Passanger can buy insurnace", async()=>{
       let result = true
       try{
@@ -194,30 +207,30 @@ contract('Flight Surety Tests', async (accounts) => {
               await config.flightSuretyApp.submitOracleResponse(oracleIndexes[idx], accounts[1], flight, timestamp, STATUS_CODE_LATE_AIRLINE, { from: accounts[a] });
             }
             catch(e) {
-              // Enable this when debugging
               //  console.log('\nError', idx, oracleIndexes[idx].toNumber(), flight, timestamp);
             }
           }
         }
-       balance = await config.flightSuretyData.getPassengerCreditBalance(passanger);
+      balance = await config.flightSuretyData.getPassengerCreditBalance(passanger);
       assert.equal(balance, OneAndHalfEther, "Passanger should have 1.5 ether in his balance");
+      // console.log("passanger balance = "+ balance);
   });
    it("Passanger can withdraw his credit",async()=>{
       let result = false;
+      // let previousCreditBlance = await config.flightSuretyData.getPassengerCreditBalance(passanger);
       let previousBalance = await web3.eth.getBalance(passanger);
+        console.log("previousBalance : "+previousBalance);
       try{
         await config.flightSuretyApp.withdraw({from: passanger});
         let newBalance = await web3.eth.getBalance(passanger);
-        //  result = new BigNumber(newBalance).isGreaterThan(previousBalance);
-        result = newBalance > previousBalance;
-        console.log("previousBalance : "+previousBalance);
+        // let newCreditBlance = await config.flightSuretyData.getPassengerCreditBalance(passanger);
+         result = new BigNumber(newBalance).isGreaterThan(previousBalance);
+        // result = newBalance > previousBalance;
         console.log("newBalance : "+newBalance);
-
       }catch(e){
         console.log(e);
          result = false;
       }
-      
       assert.equal(result, true, "New blanace should be 1.5 ethere more after getting credit");
   });
 

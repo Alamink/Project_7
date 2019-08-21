@@ -223,6 +223,7 @@ contract FlightSuretyApp {
     }
     function withdraw()
     external
+    
     requireIsOperational
     {
         flightsuretydata.pay(msg.sender);
@@ -260,6 +261,9 @@ contract FlightSuretyApp {
                         )
                         external
     {
+        // bytes32 flightKey = getFlightKey(airline, flight, timestamp);
+        // require(flights[flightKey].isRegistered,"Flight is not registered");
+
         uint8 index = getRandomIndex(msg.sender);
 
         // Generate a unique key for storing the request
@@ -268,7 +272,6 @@ contract FlightSuretyApp {
                                                 requester: msg.sender,
                                                 isOpen: true
                                             });
-
         emit OracleRequest(index, airline, flight, timestamp);
     } 
 
@@ -329,7 +332,7 @@ contract FlightSuretyApp {
         require(!oracles[msg.sender].isRegistered,"Oracle is already registered");
         // Require registration fee
         require(msg.value >= REGISTRATION_FEE, "Registration fee is required");
-
+        
         uint8[3] memory indexes = generateIndexes(msg.sender);
 
         oracles[msg.sender] = Oracle({
@@ -370,7 +373,6 @@ contract FlightSuretyApp {
     {
         require((oracles[msg.sender].indexes[0] == index) || (oracles[msg.sender].indexes[1] == index) || (oracles[msg.sender].indexes[2] == index), "Index does not match oracle request");
 
-
         bytes32 key = keccak256(abi.encodePacked(index, airline, flight, timestamp)); 
         require(oracleResponses[key].isOpen, "Flight or timestamp do not match oracle request");
 
@@ -382,7 +384,6 @@ contract FlightSuretyApp {
         if (oracleResponses[key].responses[statusCode].length >= MIN_RESPONSES) {
 
             oracleResponses[key].isOpen = false;
-
             emit FlightStatusInfo(airline, flight, timestamp, statusCode);
 
             // Handle flight status as appropriate

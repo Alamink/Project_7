@@ -30,6 +30,7 @@ contract('Oracles', async (accounts) => {
       let result = await config.flightSuretyApp.getMyIndexes.call({from: accounts[a]});
       console.log(`Oracle Registered: ${result[0]}, ${result[1]}, ${result[2]}`);
     }
+
   });
 
   it("Should not allow for Orcale double regstration",async ()=>{
@@ -42,6 +43,7 @@ contract('Oracles', async (accounts) => {
     }
     assert.equal(result, false, "it should not register the already registered Oracle");
   });
+
   it('can request flight status', async () => {
     
     // ARRANGE
@@ -64,7 +66,6 @@ contract('Oracles', async (accounts) => {
         try {
           // Submit a response...it will only be accepted if there is an Index match
           await config.flightSuretyApp.submitOracleResponse(oracleIndexes[idx], config.firstAirline, flight, timestamp, STATUS_CODE_ON_TIME, { from: accounts[a] });
-
         }
         catch(e) {
           // Enable this when debugging
