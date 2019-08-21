@@ -36,8 +36,8 @@ web3.eth.getAccounts(async(error, accts) => {
       let myIndexes = await flightSuretyApp.methods.getMyIndexes().call({from: accounts[i+49]});
         // console.log("my indexes : "+myIndexes);
         if(myIndexes.indexOf(event.returnValues.index) >= 0){
-        // let statusCode = 10*(Math.floor(Math.random()*6));
-        let statusCode = 20; // late airline
+        let statusCode = 10*(Math.floor(Math.random()*6));
+        // let statusCode = 20; // late airline
         // oracle submit random status code
         try{
         await flightSuretyApp.methods.submitOracleResponse(
